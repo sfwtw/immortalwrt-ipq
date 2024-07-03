@@ -15,7 +15,9 @@ DEFAULT_PACKAGES += \
 	kmod-usb3 kmod-usb-dwc3 kmod-usb-dwc3-qcom \
 	kmod-leds-gpio kmod-gpio-button-hotplug \
 	kmod-qca-nss-dp kmod-ath11k-ahb wpad-openssl \
-	uboot-envtools losetup \
+	e2fsprogs kmod-fs-ext4 losetup \
+	kmod-qca-nss-drv kmod-qca-nss-ecm \
+	kmod-qca-nss-drv-bridge-mgr
 	automount cpufreq
 
 $(eval $(call BuildTarget))
