@@ -17,7 +17,7 @@ DEFAULT_PACKAGES += \
 	kmod-qca-nss-dp kmod-ath11k-ahb wpad-openssl \
 	e2fsprogs kmod-fs-ext4 losetup \
 	kmod-qca-nss-drv kmod-qca-nss-ecm \
-	kmod-qca-nss-drv-bridge-mgr
+	kmod-qca-nss-drv-bridge-mgr \
 	automount cpufreq
 
 $(eval $(call BuildTarget))
