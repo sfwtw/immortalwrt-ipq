@@ -1,93 +1,95 @@
-<img src="https://avatars.githubusercontent.com/u/53193414?s=200&v=4" alt="logo" width="200" height="200" align="right">
+# ImmortalWrt IPQ - 自建 Fork 仓库
 
-# Project ImmortalWrt
+这是一个基于 OpenWrt 的自定义固件项目，专门针对 IPQ 系列芯片优化。本仓库合并了多个上游项目的优秀特性，并加入了自定义的功能增强。
 
-ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
-Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.
+## 项目简介
 
-Default login address: http://192.168.1.1 or http://immortalwrt.lan, username: __root__, password: _none_.
+本项目是基于以下上游仓库的自建 fork：
 
-## Download
-Built firmware images are available for many architectures and come with a package selection to be used as WiFi home router. To quickly find a factory image usable to migrate from a vendor stock firmware to ImmortalWrt, try the *Firmware Selector*.
+- [qosmio/openwrt-ipq](https://github.com/qosmio/openwrt-ipq) - IPQ 芯片优化版本
+- [immortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt) - ImmortalWrt 主线版本
 
-- [ImmortalWrt Firmware Selector](https://firmware-selector.immortalwrt.org/)
+### 主要特性
 
-If your device is supported, please follow the **Info** link to see install instructions or consult the support resources listed below.
+- 🚀 针对 IPQ 系列芯片深度优化
+- 🔧 集成 ImmortalWrt 的增强功能
+- 📦 添加个性化设置
+- 🌐 添加Qmodem等插件支持
+- 🔄 定期同步上游更新
 
-## Development
-To build your own firmware you need a GNU/Linux, BSD or macOS system (case sensitive filesystem required). Cygwin is unsupported because of the lack of a case sensitive file system.<br/>
+## 支持的设备
 
-  ### Requirements
-  To build with this project, Debian 11 is preferred. And you need use the CPU based on AMD64 architecture, with at least 4GB RAM and 25 GB available disk space. Make sure the __Internet__ is accessible.
+- IPQ40xx 系列路由器
+- IPQ60xx 系列路由器
+- IPQ80xx 系列路由器
+- 其他兼容设备（详见上游设备列表）
 
-  The following tools are needed to compile ImmortalWrt, the package names vary between distributions.
+## 快速开始
 
-  - Here is an example for Debian/Ubuntu users:<br/>
-    - Method 1:
-      <details>
-        <summary>Setup dependencies via APT</summary>
+### 系统要求
 
-        ```bash
-        sudo apt update -y
-        sudo apt full-upgrade -y
-        sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
-          bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
-          g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
-          libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev \
-          libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano \
-          ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils \
-          python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
-          upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
-        ```
-      </details>
-    - Method 2:
-      ```bash
-      sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
-      ```
+- Ubuntu 18.04/20.04/22.04 或其他 Linux 发行版
+- 至少 4GB RAM
+- 至少 25GB 可用磁盘空间
 
-  Note:
-  - Do everything as an unprivileged user, not root, without sudo.
-  - Using CPUs based on other architectures should be fine to compile ImmortalWrt, but more hacks are needed - No warranty at all.
-  - You must __not__ have spaces or non-ascii characters in PATH or in the work folders on the drive.
-  - If you're using Windows Subsystem for Linux (or WSL), removing Windows folders from PATH is required, please see [Build system setup WSL](https://openwrt.org/docs/guide-developer/build-system/wsl) documentation.
-  - Using macOS as the host build OS is __not__ recommended. No warranty at all. You can get tips from [Build system setup macOS](https://openwrt.org/docs/guide-developer/build-system/buildroot.exigence.macosx) documentation.
-  - For more details, please see [Build system setup](https://openwrt.org/docs/guide-developer/build-system/install-buildsystem) documentation.
+### 编译环境准备
 
-  ### Quickstart
-  1. Run `git clone -b <branch> --single-branch --filter=blob:none https://github.com/immortalwrt/immortalwrt` to clone the source code.
-  2. Run `cd immortalwrt` to enter source directory.
-  3. Run `./scripts/feeds update -a` to obtain all the latest package definitions defined in feeds.conf / feeds.conf.default
-  4. Run `./scripts/feeds install -a` to install symlinks for all obtained packages into package/feeds/
-  5. Run `make menuconfig` to select your preferred configuration for the toolchain, target system & firmware packages.
-  6. Run `make` to build your firmware. This will download all sources, build the cross-compile toolchain and then cross-compile the GNU/Linux kernel & all chosen applications for your target system.
+```bash
+# 安装依赖包
+sudo apt update
+sudo apt install build-essential clang flex bison g++ gawk \
+gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
+python3-distutils rsync unzip zlib1g-dev file wget
 
-  ### Related Repositories
-  The main repository uses multiple sub-repositories to manage packages of different categories. All packages are installed via the OpenWrt package manager called opkg. If you're looking to develop the web interface or port packages to ImmortalWrt, please find the fitting repository below.
-  - [LuCI Web Interface](https://github.com/immortalwrt/luci): Modern and modular interface to control the device via a web browser.
-  - [ImmortalWrt Packages](https://github.com/immortalwrt/packages): Community repository of ported packages.
-  - [OpenWrt Routing](https://github.com/openwrt/routing): Packages specifically focused on (mesh) routing.
-  - [OpenWrt Video](https://github.com/openwrt/video): Packages specifically focused on display servers and clients (Xorg and Wayland).
+# 克隆仓库
+git clone https://github.com/sfwtw/immortalwrt-ipq.git
+cd immortalwrt-ipq
 
-## Support Information
-For a list of supported devices see the [OpenWrt Hardware Database](https://openwrt.org/supported_devices)
-  ### Documentation
-  - [Quick Start Guide](https://openwrt.org/docs/guide-quick-start/start)
-  - [User Guide](https://openwrt.org/docs/guide-user/start)
-  - [Developer Documentation](https://openwrt.org/docs/guide-developer/start)
-  - [Technical Reference](https://openwrt.org/docs/techref/start)
+# 更新 feeds
+./scripts/feeds update -a
+./scripts/feeds install -a
+```
 
-  ### Support Community
-  - Support Chat: group [@ctcgfw_openwrt_discuss](https://t.me/ctcgfw_openwrt_discuss) on [Telegram](https://telegram.org/).
-  - Support Chat: group [#immortalwrt](https://matrix.to/#/#immortalwrt:matrix.org) on [Matrix](https://matrix.org/).
+### 编译固件
 
-## License
-ImmortalWrt is licensed under [GPL-2.0-only](https://spdx.org/licenses/GPL-2.0-only.html).
+```bash
+# 配置编译选项
+cp nss-setup/config-nss.seed .config
+make defconfig
+make menuconfig
 
-## Acknowledgements
-<table>
-  <tr>
-    <td><a href="https://dlercloud.com/"><img src="https://user-images.githubusercontent.com/22235437/111103249-f9ec6e00-8588-11eb-9bfc-67cc55574555.png" width="183" height="52" border="0" alt="Dler Cloud"></a></td>
-    <td><a href="https://www.jetbrains.com/"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_square.png" width="120" height="120" border="0" alt="JetBrains Black Box Logo logo"></a></td>
-    <td><a href="https://sourceforge.net/"><img src="https://sourceforge.net/sflogo.php?type=17&group_id=3663829" alt="SourceForge" width=200></a></td>
-  </tr>
-</table>
+# 开始编译
+make -j$(nproc) download
+make -j$(nproc) V=s
+```
+
+## 自定义功能
+
+本仓库在上游基础上添加了以下自定义功能：
+
+- 🔐 增强的防火墙规则
+- 📊 系统监控面板
+- 🔧 一键优化脚本
+- 📱 移动端管理界面优化
+- 🌍 多语言支持增强
+
+## 许可证
+
+本项目基于 GPL-2.0 许可证开源，详见 [LICENSE](LICENSE) 文件。
+
+## 致谢
+
+感谢以下项目的贡献：
+
+- [OpenWrt Project](https://openwrt.org/)
+- [ImmortalWrt Team](https://github.com/immortalwrt/immortalwrt)
+- [qosmio](https://github.com/qosmio/openwrt-ipq)
+- 所有为开源路由器固件做出贡献的开发者们
+
+## 免责声明
+
+本固件仅供学习和研究使用，使用者需自行承担相关风险。请在使用前仔细阅读相关文档，确保了解刷机风险。
+
+---
+
+⭐ 如果这个项目对你有帮助，请给个 Star 支持一下！
