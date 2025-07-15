@@ -40,7 +40,7 @@ define Device/night_cpe
 	DEVICE_MODEL := CPE
 	SOC := ipq8072
 	DEVICE_DTS_CONFIG := config@hk09
-	DEVICE_PACKAGES := ipq-wifi-night_cpe
+	DEVICE_PACKAGES := ipq-wifi-night_cpe kmod-fs-f2fs f2fs-tools
 endef
 TARGET_DEVICES += night_cpe
 

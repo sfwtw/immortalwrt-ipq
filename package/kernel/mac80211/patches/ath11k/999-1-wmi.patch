@@ -1,0 +1,63 @@
+Set the ATH11K_FLAG_CRASH_FLUSH and ATH11K_FLAG_RECOVERY flags when the
+host driver receives the firmware crash notification from MHI. This
+prevents sending WMI commands to the firmware during recovery.
+We want to prevent the laptop from freezing or becoming extremely slow when
+its firmware repeatedly crashes while attempting to connect to a known Wi-Fi
+network. This often happens with routers that intermittently fail to reconnect
+until the access point is reset. While this solution doesn't fix the underlying
+router issue, it would allow the laptop to select a different Wi-Fi network and
+significant performance degradation during the recovery process.
+
+[75795.712161] ath11k_pci 0000:02:00.0: firmware crashed: MHI_CB_EE_RDDM
+[75797.738073] ath11k_pci 0000:02:00.0: wmi command 262145 timeout
+[75797.738090] ath11k_pci 0000:02:00.0: Failed to send WMI_PDEV_OBSS_PD_SPATIAL_REUSE_CMDID
+[75797.738101] ath11k_pci 0000:02:00.0: failed to set vdev 0 OBSS PD parameters: -11
+[75800.746321] ath11k_pci 0000:02:00.0: wmi command 20488 timeout
+[75800.746344] ath11k_pci 0000:02:00.0: failed to send WMI_VDEV_SET_PARAM_CMDID
+[75800.746358] ath11k_pci 0000:02:00.0: failed to set vdev 0 dtim policy: -11
+[75803.754345] ath11k_pci 0000:02:00.0: wmi command 237571 timeout
+[75803.754360] ath11k_pci 0000:02:00.0: failed to send WMI_11D_SCAN_STOP_CMDID: -11
+[75803.754371] ath11k_pci 0000:02:00.0: failed to stopt 11d scan vdev 0 ret: -11
+[75806.762259] ath11k_pci 0000:02:00.0: wmi command 28684 timeout
+[75806.762281] ath11k_pci 0000:02:00.0: Failed to send WMI_BSS_COLOR_CHANGE_ENABLE_CMDID
+[75806.762294] ath11k_pci 0000:02:00.0: failed to enable bss color change on vdev 0: -11
+[75809.770916] ath11k_pci 0000:02:00.0: wmi command 172035 timeout
+[75809.770930] ath11k_pci 0000:02:00.0: Failed to send WMI_OBSS_COLOR_COLLISION_DET_CONFIG_CMDID
+[75809.770938] ath11k_pci 0000:02:00.0: failed to set bss color collision on vdev 0: -11
+[75809.770966] wlp2s0: associated
+[75809.771051] wlp2s0: deauthenticating from a0:95:7f:45:e8:47 by local choice (Reason: 3=DEAUTH_LEAVING)
+[75809.782908] ieee80211 phy0: Hardware restart was requested
+[75809.782932] ath11k_pci 0000:02:00.0: failed to lookup peer a0:95:7f:45:e8:47 on vdev 0
+[75812.842136] ath11k_pci 0000:02:00.0: wmi command 20488 timeout
+[75812.842153] ath11k_pci 0000:02:00.0: failed to send WMI_VDEV_SET_PARAM_CMDID
+[75812.842164] ath11k_pci 0000:02:00.0: Failed to set CTS prot for VDEV: 0
+[75815.850227] ath11k_pci 0000:02:00.0: wmi command 20488 timeout
+
+Signed-off-by: Michael Trimarchi <michael@amarulasolutions.com>
+
+---
+
+ drivers/net/wireless/ath/ath11k/mhi.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/ath/ath11k/mhi.c b/drivers/net/wireless/ath/ath11k/mhi.c
+index acd76e9392d31..af7ff4fc794de 100644
+--- a/drivers/net/wireless/ath/ath11k/mhi.c
++++ b/drivers/net/wireless/ath/ath11k/mhi.c
+@@ -286,8 +286,11 @@ static void ath11k_mhi_op_status_cb(struct mhi_controller *mhi_cntrl,
+ 			break;
+ 		}
+ 
+-		if (!(test_bit(ATH11K_FLAG_UNREGISTERING, &ab->dev_flags)))
++		if (!(test_bit(ATH11K_FLAG_UNREGISTERING, &ab->dev_flags))) {
++			set_bit(ATH11K_FLAG_CRASH_FLUSH, &ab->dev_flags);
++			set_bit(ATH11K_FLAG_RECOVERY, &ab->dev_flags);
+ 			queue_work(ab->workqueue_aux, &ab->reset_work);
++		}
+ 
+ 		break;
+ 	default:
+-- 
+2.43.0
+
+base-commit: 0f70f5b08a47a3bc1a252e5f451a137cde7c98ce
