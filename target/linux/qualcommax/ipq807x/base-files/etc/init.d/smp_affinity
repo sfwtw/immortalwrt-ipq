@@ -81,6 +81,25 @@ set_affinity() {
     done
 }
 
+setaffinity() {
+
+  local irq_name="$1" affinity="$2" occurrence="${3:-1}" bitmask
+
+  awk -v irq_name="$irq_name" -v occurrence="$occurrence" '
+    BEGIN{count=0}
+    $NF==irq_name {
+      if(++count==occurrence){
+        sub(/:$/,"",$1)
+        print $1
+      }
+  }' /proc/interrupts | while read -r irq; do
+    $enable_log && {
+      log_msg "$irq_name" "$affinity" "$occurrence" "$irq"
+    }
+    bitmask=$(cpus_to_bitmask "$affinity") && echo "$bitmask" > /proc/irq/"$irq"/smp_affinity
+  done
+}
+
 enable_affinity_ipq807x() {
 
   # assign 4 rx interrupts to each core
@@ -104,6 +123,29 @@ enable_affinity_ipq807x() {
   set_affinity 'edma_rxfill'                   3
   set_affinity 'edma_rxdesc'                   3
   set_affinity 'edma_misc'                     3
+
+  #set_affinity 'ce1'         2
+	#set_affinity 'ce2'         1
+	#set_affinity 'ce3'         0
+
+	echo "performance" > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
+  #echo 2000 > /proc/sys/net/core/netdev_max_backlog
+  #echo 600 > /proc/sys/net/core/netdev_budget
+
+  set_affinity 'xhci-hcd:usb3'                 0
+	if ip link show rmnet_mhi0 >/dev/null 2>&1; then
+		echo f > "/sys/class/net/rmnet_mhi0/queues/rx-0/rps_cpus"
+		echo f > "/sys/class/net/rmnet_mhi0.1/queues/rx-0/rps_cpus"
+		setaffinity  'mhi'         0 1
+		setaffinity  'mhi'         0 2
+		setaffinity  'mhi'         2 3
+		setaffinity  'mhi'         3 4
+	elif ip link show usb0 >/dev/null 2>&1; then
+		echo f > "/sys/class/net/usb0/queues/rx-0/rps_cpus"
+	elif ip link show wwan0 >/dev/null 2>&1; then
+		echo f > "/sys/class/net/wwan0/queues/rx-0/rps_cpus"
+		echo f > "/sys/class/net/wwan0_1/queues/rx-0/rps_cpus"
+	fi
 }
 
 boot() {
