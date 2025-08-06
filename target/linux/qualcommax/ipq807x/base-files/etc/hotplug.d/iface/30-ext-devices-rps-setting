@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. /etc/init.d/smp_affinity
+
+for IFACE in /sys/class/net/*; do
+    INTERFACE=$(basename "$IFACE")
+    IFNAME_PREFIX="${INTERFACE%%[0-9]*}"
+    # logger -t ext-devices-rps "Setting RPS for ${INTERFACE} with prefix ${IFNAME_PREFIX}"
+    if { [ "$IFNAME_PREFIX" = "usb" ] || [ "$IFNAME_PREFIX" = "eth" ]; }; then
+        echo 7 > "/sys/class/net/${INTERFACE}/queues/rx-0/rps_cpus"
+    elif [ "$IFNAME_PREFIX" = "rmnet" ]; then
+        echo 7 > "/sys/class/net/${INTERFACE}/queues/rx-0/rps_cpus"
+        setaffinity  'mhi'         3 1
+        setaffinity  'mhi'         3 2
+        setaffinity  'mhi'         3 3
+        setaffinity  'mhi'         3 4
+    elif [ "$IFNAME_PREFIX" = "wwan" ]; then
+        echo 7 > "/sys/class/net/${INTERFACE}/queues/rx-0/rps_cpus"
+        if [ -s "/sys/class/net/${INTERFACE}/device/device/t7xx_mode" ]; then
+            set_affinity 'mtk_t7xx_0'    3
+            set_affinity 'mtk_t7xx_1'    3
+            set_affinity 'mtk_t7xx_2'    3
+            set_affinity 'mtk_t7xx_4'    3
+            set_affinity 'mtk_t7xx_5'    3
+            set_affinity 'mtk_t7xx_6'    3
+        fi
+    fi
+done
