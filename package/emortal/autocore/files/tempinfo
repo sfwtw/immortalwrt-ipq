@@ -4,6 +4,7 @@
 
 IEEE_PATH="/sys/class/ieee80211"
 THERMAL_PATH="/sys/class/thermal"
+model=$(jsonfilter -e ''@.model.id'' < /etc/board.json)
 
 case "$DISTRIB_TARGET" in
 ipq40xx/*|ipq806x/*)
@@ -29,12 +30,22 @@ ipq40xx/*)
 	;;
 esac
 
+case "$model" in
+night,cpe)
+	mdio_temp="$(sensors "90000mdio107-mdio-7" 2>"/dev/null" | grep -E "temp1:" | grep -Eo "\+[0-9.]*°C" | head -n1 | tr -d "+")"
+	[ -n "$mdio_temp" ] && ext_temp="ARQ108: $mdio_temp"
+	;;
+esac
+
 if [ -n "$cpu_temp" ] && [ -z "$wifi_temp" ]; then
-	echo -n "CPU: $cpu_temp"
+	temps="CPU: $cpu_temp"
 elif [ -z "$cpu_temp" ] && [ -n "$wifi_temp" ]; then
-	echo -n "WiFi: $wifi_temp"
+	temps="WiFi: $wifi_temp"
 elif [ -n "$cpu_temp" ] && [ -n "$wifi_temp" ]; then
-	echo -n "CPU: $cpu_temp, WiFi: $wifi_temp"
+	temps="CPU: $cpu_temp, WiFi: $wifi_temp"
 else
-	echo -n "No temperature info"
+	temps="No temperature info"
 fi
+
+[ -n "$ext_temp" ] && temps="$temps, $ext_temp"
+echo -n "$temps"
