@@ -33,6 +33,17 @@ define Build/wax6xx-netgear-tar
 	rm -rf $@.tmp
 endef
 
+define Device/night_cpe
+	$(call Device/FitImage)
+	$(call Device/EmmcImage)
+	DEVICE_VENDOR := Night
+	DEVICE_MODEL := CPE
+	SOC := ipq8072
+	DEVICE_DTS_CONFIG := config@hk09
+	DEVICE_PACKAGES := ipq-wifi-night_cpe kmod-fs-f2fs f2fs-tools
+endef
+TARGET_DEVICES += night_cpe
+
 define Device/aliyun_ap8220
 	$(call Device/FitImage)
 	$(call Device/UbiFit)

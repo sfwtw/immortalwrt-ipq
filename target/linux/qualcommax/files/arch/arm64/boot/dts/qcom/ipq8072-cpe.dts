@@ -1,0 +1,445 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+/dts-v1/;
+
+#include "ipq8074.dtsi"
+#include "ipq8074-hk-cpu.dtsi"
+#include "ipq8074-ess.dtsi"
+#include "ipq8074-nss.dtsi"
+#include "ipq8074-common.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
+
+/ {
+	model = "Night CPE";
+	compatible = "night,cpe", "qcom,ipq8074";
+
+	aliases {
+		serial0 = &blsp1_uart5;
+
+		led-boot = &led_power_red;
+		led-failsafe = &led_power_red;
+		led-running = &led_power_green;
+		led-upgrade = &led_power_blue;
+
+		ethernet1 = &dp3;
+		ethernet2 = &dp4;
+		ethernet3 = &dp6_syn;
+
+		label-mac-device = &dp3;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&iot_pins>;
+		pinctrl-names = "default";
+
+		reset {
+			label = "reset";
+			gpios = <&tlmm 1 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_RESTART>;
+		};
+
+		wps {
+			label = "wps";
+			gpios = <&tlmm 47 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_WPS_BUTTON>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_power_red: power-red {
+			label = "red:power";
+			gpios = <&tlmm 54 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_RED>;
+		};
+
+		led_power_green: power-green {
+			label = "green:power";
+			gpios = <&tlmm 55 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_GREEN>;
+		};
+
+		led_power_blue: power-blue {
+			label = "blue:power";
+			gpios = <&tlmm 60 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_BLUE>;
+		};
+
+		led_4g_red: net4g-red {
+			label = "red:4g";
+			gpios = <&tlmm 46 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_RED>;
+		};
+
+		led_4g_green: net4g-green {
+			label = "green:4g";
+			gpios = <&tlmm 48 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_GREEN>;
+		};
+
+		led_4g_blue: net4g-blue {
+			label = "blue:4g";
+			gpios = <&tlmm 52 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_BLUE>;
+		};
+
+		led_5g_red: net5g-red {
+			label = "red:5g";
+			gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_RED>;
+		};
+
+		led_5g_green: net5g-green {
+			label = "green:5g";
+			gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_GREEN>;
+		};
+
+		led_5g_blue: net5g-blue {
+			label = "blue:5g";
+			gpios = <&tlmm 42 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_BLUE>;
+		};
+
+		led_wps_green: wps-green {
+			label = "green:wps";
+			gpios = <&tlmm 56 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_GREEN>;
+		};
+
+		led_wifi_green: wifi-green {
+			label = "green:wifi";
+			gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_GREEN>;
+		};
+	};
+};
+
+&tlmm {
+	mdio_pins: mdio-pins {
+		mdc {
+			pins = "gpio68";
+			function = "mdc";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+
+		mdio {
+			pins = "gpio69";
+			function = "mdio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+
+		mux {
+			pins = "gpio50";
+			function = "gpio";
+			drive-strength = <8>;
+			output-high;
+			bias-pull-up;
+		};
+	};
+
+	iot_pins: iot_pins {
+		wps_button {
+			pins = "gpio47";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+
+		reset_button {
+			pins = "gpio1";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	pcie0_wake_gpio: pcie0_wake_gpio {
+		pins = "gpio59";
+		function = "pcie0_wake";
+		drive-strength = <8>;
+		bias-pull-up;
+	};
+
+	power5v_pa_en_gpio: power5v_pa_en_gpio {
+		mux {
+			pins = "gpio0";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+
+	pcie_sdx_gpio: pcie_sdx_gpio {
+		ap2mdm_err_ftl {
+			pins = "gpio27";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+
+		sdx_pon_gpio {
+			pins = "gpio5";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+			output-high;
+		};
+
+		mdm2ap_err_ftl {
+			pins = "gpio33";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		
+		ap2mdm_status {
+			pins = "gpio26";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+			output-high;
+		};
+	};
+};
+
+&blsp1_uart3 {
+	status = "disabled";
+};
+
+&blsp1_i2c2 {
+	status = "disabled";
+};
+
+&blsp1_spi1 {
+	status = "okay";
+
+	flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <50000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "0:SBL1";
+				reg = <0x0 0x50000>;
+				read-only;
+			};
+
+			partition@50000 {
+				label = "0:MIBIB";
+				reg = <0x50000 0x10000>;
+				read-only;
+			};
+
+			partition@60000 {
+				label = "0:BOOTCONFIG";
+				reg = <0x60000 0x20000>;
+				read-only;
+			};
+
+			partition@80000 {
+				label = "0:BOOTCONFIG1";
+				reg = <0x80000 0x20000>;
+				read-only;
+			};
+
+			partition@a0000 {
+				label = "0:QSEE";
+				reg = <0xa0000 0x180000>;
+				read-only;
+			};
+
+			partition@220000 {
+				label = "0:QSEE_1";
+				reg = <0x220000 0x180000>;
+				read-only;
+			};
+
+			partition@3a0000 {
+				label = "0:DEVCFG";
+				reg = <0x3a0000 0x10000>;
+				read-only;
+			};
+
+			partition@3b0000 {
+				label = "0:DEVCFG_1";
+				reg = <0x3b0000 0x10000>;
+				read-only;
+			};
+
+			partition@3c0000 {
+				label = "0:APDP";
+				reg = <0x3c0000 0x10000>;
+				read-only;
+			};
+
+			partition@3d0000 {
+				label = "0:APDP_1";
+				reg = <0x3d0000 0x10000>;
+				read-only;
+			};
+
+			partition@3e0000 {
+				label = "0:RPM";
+				reg = <0x3e0000 0x40000>;
+				read-only;
+			};
+
+			partition@420000 {
+				label = "0:RPM_1";
+				reg = <0x420000 0x40000>;
+				read-only;
+			};
+
+			partition@460000 {
+				label = "0:CDT";
+				reg = <0x460000 0x10000>;
+				read-only;
+			};
+
+			partition@470000 {
+				label = "0:CDT_1";
+				reg = <0x470000 0x10000>;
+				read-only;
+			};
+
+			partition@480000 {
+				label = "0:APPSBLENV";
+				reg = <0x480000 0x10000>;
+			};
+
+			partition@490000 {
+				label = "0:APPSBL";
+				reg = <0x490000 0xa0000>;
+				read-only;
+			};
+
+			partition@530000 {
+				label = "0:APPSBL_1";
+				reg = <0x530000 0xa0000>;
+				read-only;
+			};
+
+			partition@5d0000 {
+				label = "0:ART";
+				reg = <0x5d0000 0x40000>;
+				read-only;
+			};
+
+			partition@610000 {
+				label = "0:ETHPHYFW";
+				reg = <0x610000 0x80000>;
+				read-only;
+			};
+		};
+	};
+};
+
+&sdhc_1 {
+	/delete-property/ mmc-hs400-1_8v;
+	mmc-hs200-1_8v;
+	mmc-ddr-1_8v;
+	vqmmc-supply = <&l11>;
+	status = "okay";
+};
+
+&mdio {
+	status = "okay";
+	pinctrl-0 = <&mdio_pins>;
+	pinctrl-names = "default";
+	reset-gpios = <&tlmm 37 GPIO_ACTIVE_LOW>,
+			  <&tlmm 50 GPIO_ACTIVE_HIGH>;
+
+	qca8075_2: ethernet-phy@2 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <2>;
+	};
+
+	qca8075_3: ethernet-phy@3 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <3>;
+	};
+
+	aqr108: ethernet-phy@5 {
+		compatible = "ethernet-phy-ieee802.3-c45";
+		reg = <7>;
+	};
+};
+
+&switch {
+	status = "okay";
+	switch_lan_bmp = <(ESS_PORT3 | ESS_PORT4 | ESS_PORT6)>;
+	switch_mac_mode = <MAC_MODE_PSGMII>;
+	switch_mac_mode2 = <MAC_MODE_USXGMII>;
+
+	qcom,port_phyinfo {
+		port@2 {
+			port_id = <3>;
+			phy_address = <2>;
+		};
+		port@3 {
+			port_id = <4>;
+			phy_address = <3>;
+		};
+		port@5 {
+			port_id = <6>;
+			phy_address = <7>;
+			ethernet-phy-ieee802.3-c45;
+		};
+	};
+};
+
+&edma {
+	status = "okay";
+};
+
+&dp3 {
+	status = "okay";
+	phy-handle = <&qca8075_2>;
+	label = "lan1";
+};
+
+&dp4 {
+	status = "okay";
+	phy-handle = <&qca8075_3>;
+	label = "lan2";
+};
+
+&dp6_syn {
+	status = "okay";
+	phy-handle = <&aqr108>;
+	label = "lan3";
+};
+
+&pcie0 {
+	status = "okay";
+	pinctrl-0 = <&pcie_sdx_gpio>, <&pcie0_wake_gpio>;
+	pinctrl-names = "default";
+	perst-gpios = <&tlmm 58 GPIO_ACTIVE_LOW>;
+};
+
+&wifi {
+	status = "okay";
+	pinctrl-0 = <&power5v_pa_en_gpio>;
+	pinctrl-names = "default";
+	qcom,ath11k-calibration-variant = "Night-CPE";
+};
