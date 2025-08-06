@@ -45,7 +45,7 @@ Signed-off-by: Robert Marko <robimarko@gmail.com>
  		};
  
  		l2_0: l2-cache {
-@@ -84,6 +88,54 @@
+@@ -84,6 +88,61 @@
  		};
  	};
  
@@ -91,6 +91,13 @@ Signed-off-by: Robert Marko <robimarko@gmail.com>
 +
 +		opp-2208000000 {
 +			opp-hz = /bits/ 64 <2208000000>;
++			opp-microvolt = <6>;
++			opp-supported-hw = <0x1>;
++			clock-latency-ns = <200000>;
++		};
++
++		opp-2400000000 {
++			opp-hz = /bits/ 64 <2400000000>;
 +			opp-microvolt = <6>;
 +			opp-supported-hw = <0x1>;
 +			clock-latency-ns = <200000>;
