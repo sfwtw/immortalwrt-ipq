@@ -231,6 +231,7 @@ platform_do_upgrade() {
 		remove_oem_ubi_volume ubifs
 		nand_do_upgrade "$1"
 		;;
+	night,cpe|\
 	prpl,haze|\
 	qnap,301w)
 		CI_KERNPART="0:HLOS"
@@ -349,6 +350,7 @@ platform_do_upgrade() {
 
 platform_copy_config() {
 	case "$(board_name)" in
+	night,cpe|\
 	prpl,haze|\
 	qnap,301w|\
 	spectrum,sax1v1k|\
