@@ -165,6 +165,10 @@ platform_pre_upgrade() {
 
 platform_do_upgrade() {
 	case "$(board_name)" in
+	night,viomi)
+		CI_UBIPART="rootfs"
+		nand_do_upgrade "$1"
+		;;
 	aliyun,ap8220)
 		active="$(fw_printenv -n active)"
 		if [ "$active" -eq "1" ]; then

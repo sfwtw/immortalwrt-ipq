@@ -69,6 +69,7 @@ ALLWIFIBOARDS:= \
 	netgear_wax620 \
 	netgear_wax630 \
 	night_cpe \
+	night_viomi \
 	prpl_haze \
 	qihoo_360v6 \
 	qnap_301w \
@@ -246,6 +247,7 @@ $(eval $(call generate-ipq-wifi-package,netgear_wax610y,Netgear WAX610Y))
 $(eval $(call generate-ipq-wifi-package,netgear_wax620,Netgear WAX620))
 $(eval $(call generate-ipq-wifi-package,netgear_wax630,Netgear WAX630))
 $(eval $(call generate-ipq-wifi-package,night_cpe,Night CPE))
+$(eval $(call generate-ipq-wifi-package,night_viomi,Viomi Router))
 $(eval $(call generate-ipq-wifi-package,qihoo_360v6,Qihoo 360V6))
 $(eval $(call generate-ipq-wifi-package,qnap_301w,QNAP 301w))
 $(eval $(call generate-ipq-wifi-package,prpl_haze,prpl Haze))

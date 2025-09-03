@@ -33,6 +33,19 @@ define Build/wax6xx-netgear-tar
 	rm -rf $@.tmp
 endef
 
+define Device/night_viomi
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := Viomi
+	DEVICE_MODEL := Router
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_DTS_CONFIG := config@ac04
+	SOC := ipq8071
+	DEVICE_PACKAGES := ipq-wifi-night_viomi
+endef
+TARGET_DEVICES += night_viomi
+
 define Device/night_cpe
 	$(call Device/FitImage)
 	$(call Device/EmmcImage)

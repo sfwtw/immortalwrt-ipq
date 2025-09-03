@@ -1,0 +1,437 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+/dts-v1/;
+
+#include "ipq8074-512m.dtsi"
+#include "ipq8074-hk-cpu.dtsi"
+#include "ipq8074-ess.dtsi"
+#include "ipq8074-nss.dtsi"
+#include "ipq8074-common.dtsi"
+
+/ {
+	model = "Viomi Router";
+	compatible = "night,viomi", "qcom,ipq8074";
+
+	aliases {
+		serial0 = &blsp1_uart5;
+		serial1 = &blsp1_uart3;
+		serial2 = &blsp1_uart2;
+
+		ethernet1 = &dp4;
+		ethernet2 = &dp5;
+
+		label-mac-device = &dp4;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs-append = " root=/dev/ubiblock0_1";
+	};
+
+	keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&iot_pins>;
+		pinctrl-names = "default";
+
+		reset {
+			label = "reset";
+			gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_RESTART>;
+			linux,input-type = <1>;
+			debounce-interval = <60>;
+		};
+
+		onetouch {
+			label = "onetouch";
+			gpios = <&tlmm 50 GPIO_ACTIVE_HIGH>;
+			linux,code = <BTN_0>;
+			linux,input-type = <1>;
+			debounce-interval = <60>;
+		};
+
+		power {
+			label = "power";
+			gpios = <&tlmm 42 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_POWER>;
+			linux,input-type = <1>;
+			debounce-interval = <60>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-0 = <&led_pins>;
+		pinctrl-names = "default";
+
+		led_4g: led-4g {
+			default-state = "off";
+			label = "led_4g";
+			gpios = <&tlmm 9 GPIO_ACTIVE_LOW>;
+		};
+
+		led_5g: led-5g {
+			default-state = "off";
+			label = "led_5g";
+			gpios = <&tlmm 52 GPIO_ACTIVE_LOW>;
+		};
+
+		wifi_led: led-wifi {
+			default-state = "off";
+			label = "wifi_led";
+			gpios = <&tlmm 43 GPIO_ACTIVE_LOW>;
+		};
+	};
+};
+
+&soc {
+	blsp1_uart2: serial@78b0000 {
+		compatible = "qcom,msm-uartdm-v1.4", "qcom,msm-uartdm";
+		reg = <0x078b0000 0x200>;
+		interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&gcc GCC_BLSP1_UART2_APPS_CLK>,
+				<&gcc GCC_BLSP1_AHB_CLK>;
+		clock-names = "core", "iface";
+		pinctrl-0 = <&serial_2_pins>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&tlmm {
+	mdio_pins: mdio-pins {
+		mdc {
+			pins = "gpio68";
+			function = "mdc";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+
+		mdio {
+			pins = "gpio69";
+			function = "mdio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	iot_pins: iot_pins {
+		onetouch_button {
+			pins = "gpio50";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-disable;
+		};
+
+		power_button {
+			pins = "gpio42";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-disable;
+		};
+
+		reset_button {
+			pins = "gpio64";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-disable;
+		};
+	};
+
+	led_pins: led_pins {
+		4g_led {
+			bias-pull-down;
+			drive-strength = <8>;
+			function = "gpio";
+			pins = "gpio9";
+		};
+
+		5g_led {
+			bias-pull-down;
+			drive-strength = <8>;
+			function = "gpio";
+			pins = "gpio52";
+		};
+
+		wifi_led {
+			bias-pull-down;
+			drive-strength = <8>;
+			function = "gpio";
+			pins = "gpio43";
+		};
+
+		ble_reset {
+			bias-disable;
+			drive-strength = <8>;
+			function = "gpio";
+			pins = "gpio0";
+		};
+	};
+
+	pcie_pins: pcie_pins {
+		pcie0_rst {
+			bias-pull-down;
+			drive-strength = <8>;
+			function = "pcie0_rst";
+			pins = "gpio58";
+		};
+
+		pcie0_wake {
+			bias-pull-down;
+			drive-strength = <8>;
+			function = "pcie0_wake";
+			pins = "gpio59";
+		};
+	};
+
+	rg500_pins: rg500_pins {
+		mux_2 {
+			bias-pull-up;
+			function = "gpio";
+			output-high;
+			pins = "gpio25";
+		};
+	};
+
+	serial_2_pins: serial_2_pins {
+		mux {
+			bias-disable;
+			function = "blsp2_uart";
+			output-high;
+			pins = "gpio44", "gpio45";
+		};
+	};
+};
+
+&blsp1_spi1 {
+	cs-select = <0>;
+	status = "okay";
+
+	m25p80@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+		compatible = "n25q128a11";
+		linux,modalias = "m25p80", "n25q128a11";
+		spi-max-frequency = <50000000>;
+		use-default-sizes;
+	};
+};
+
+&qpic_nand {
+	status = "okay";
+
+	partitions {
+		status = "disabled";
+	};
+
+	nand@0 {
+		reg = <0>;
+		nand-ecc-strength = <8>;
+		nand-ecc-step-size = <512>;
+		nand-bus-width = <8>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "0:sbl1";
+				reg = <0x0 0x100000>;
+				read-only;
+			};
+
+			partition@100000 {
+				label = "0:mibib";
+				reg = <0x100000 0x100000>;
+				read-only;
+			};
+
+			partition@200000 {
+				label = "0:bootconfig";
+				reg = <0x200000 0x80000>;
+				read-only;
+			};
+
+			partition@280000 {
+				label = "0:bootconfig1";
+				reg = <0x280000 0x80000>;
+				read-only;
+			};
+
+			partition@300000 {
+				label = "0:qsee_1";
+				reg = <0x300000 0x300000>;
+				read-only;
+			};
+
+			partition@600000 {
+				label = "0:qsee";
+				reg = <0x600000 0x300000>;
+				read-only;
+			};
+
+			partition@900000 {
+				label = "0:devcfg_1";
+				reg = <0x900000 0x80000>;
+				read-only;
+			};
+
+			partition@980000 {
+				label = "0:devcfg";
+				reg = <0x980000 0x80000>;
+				read-only;
+			};
+
+			partition@a00000 {
+				label = "0:apdp";
+				reg = <0xa00000 0x80000>;
+				read-only;
+			};
+
+			partition@a80000 {
+				label = "0:apdp_1";
+				reg = <0xa80000 0x80000>;
+				read-only;
+			};
+
+			partition@b00000 {
+				label = "0:rpm_1";
+				reg = <0xb00000 0x80000>;
+				read-only;
+			};
+
+			partition@b80000 {
+				label = "0:rpm";
+				reg = <0xb80000 0x80000>;
+				read-only;
+			};
+
+			partition@c00000 {
+				label = "0:cdt_1";
+				reg = <0xc00000 0x80000>;
+				read-only;
+			};
+
+			partition@c80000 {
+				label = "0:cdt";
+				reg = <0xc80000 0x80000>;
+				read-only;
+			};
+
+			partition@d00000 {
+				label = "0:appsblenv";
+				reg = <0xd00000 0x80000>;
+			};
+
+			partition@d80000 {
+				label = "0:appsbl_1";
+				reg = <0xd80000 0x100000>;
+				read-only;
+			};
+
+			partition@e80000 {
+				label = "0:appsbl";
+				reg = <0xe80000 0x100000>;
+				read-only;
+			};
+
+			partition@f80000 {
+				label = "0:art";
+				reg = <0xf80000 0x80000>;
+				read-only;
+			};
+
+			partition@1000000 {
+				label = "rootfs_1";
+				reg = <0x1000000 0x4500000>;
+			};
+
+			partition@5500000 {
+				label = "0:wififw_1";
+				reg = <0x5500000 0x900000>;
+				read-only;
+			};
+
+			partition@5e00000 {
+				label = "rootfs";
+				reg = <0x5e00000 0x4500000>;
+			};
+
+			partition@a300000 {
+				label = "0:wififw";
+				reg = <0xa300000 0x900000>;
+				read-only;
+			};
+
+			partition@ac00000 {
+				label = "0:ethphyfw";
+				reg = <0xac00000 0x80000>;
+				read-only;
+			};
+		};
+	};
+};
+
+&mdio {
+	status = "okay";
+	pinctrl-0 = <&mdio_pins>;
+	pinctrl-names = "default";
+	reset-gpios = <&tlmm 37 GPIO_ACTIVE_LOW>;
+
+	qca8075_3: ethernet-phy@3 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <3>;
+	};
+
+	qca8075_4: ethernet-phy@4 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <4>;
+	};
+};
+
+&switch {
+	status = "okay";
+	switch_lan_bmp = <(ESS_PORT4 | ESS_PORT5)>;
+	switch_mac_mode = <MAC_MODE_QSGMII>;
+
+	qcom,port_phyinfo {
+		port@4 {
+			port_id = <4>;
+			phy_address = <3>;
+		};
+		port@5 {
+			port_id = <5>;
+			phy_address = <4>;
+		};
+	};
+};
+
+&edma {
+	status = "okay";
+};
+
+&dp4 {
+	status = "okay";
+	phy-handle = <&qca8075_3>;
+	label = "lan1";
+};
+
+&dp5 {
+	status = "okay";
+	phy-handle = <&qca8075_4>;
+	label = "lan2";
+};
+
+&pcie0 {
+	status = "okay";
+	pinctrl-0 = <&pcie_pins>, <&rg500_pins>;
+	pinctrl-names = "default";
+	perst-gpio = <&tlmm 58 GPIO_ACTIVE_HIGH>;
+};
+
+&wifi {
+	status = "okay";
+	qcom,ath11k-calibration-variant = "Night-Viomi";
+	qcom,ath11k-fw-memory-mode = <1>;
+};

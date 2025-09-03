@@ -11,6 +11,9 @@ ipq807x_setup_interfaces()
 	local board="$1"
 
 	case "$board" in
+	night,viomi)
+		ucidef_set_interface_lan "lan1 lan2"
+		;;
 	night,cpe)
 		ucidef_set_interface_lan "lan1 lan2 lan3"
 		;;
