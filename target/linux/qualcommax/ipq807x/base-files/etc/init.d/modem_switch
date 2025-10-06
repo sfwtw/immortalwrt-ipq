@@ -1,0 +1,57 @@
+#!/bin/sh /etc/rc.common
+
+START=20
+STOP=80
+
+boot() {
+	case $(board_name) in
+		night,viomi)
+			{
+			logger -t modem_switch "Starting modem initialization for $(board_name)"
+			echo 570 > /sys/class/gpio/export
+			echo out > /sys/class/gpio/gpio570/direction
+			echo 0 > /sys/class/gpio/gpio570/value
+			echo 1 > /sys/class/gpio/gpio570/value
+			sleep 1
+			echo 1 > /sys/bus/pci/rescan
+			sleep 2
+			if ! lspci | grep -q "01:00.0"; then
+				logger -t modem_switch "PCI device 0000:01:00.0 not detected, attempting USB reset"
+				for dev in /dev/ttyUSB*; do
+					if [ -e "$dev" ]; then
+						echo "at+cfun=1,1" > "$dev" || logger -t modem_switch "Failed to send AT command to $dev"
+					fi
+				done
+			fi
+			local retries=0
+			while ! lspci | grep -q "01:00.0" && [ $retries -lt 5 ]; do
+				echo 0 > /sys/class/gpio/gpio570/value
+				echo 1 > /sys/class/gpio/gpio570/value
+				echo 1 > /sys/bus/pci/rescan
+				sleep 3
+				retries=$((retries + 1))
+			done
+			if lspci | grep -q "01:00.0"; then
+				logger -t modem_switch "PCI device detected, running modem scan"
+				/usr/share/qmodem/modem_scan.sh scan pcie
+			else
+				logger -t modem_switch "PCI device not detected"
+			fi
+			} &
+		;;
+	esac
+}
+
+stop() {
+	case $(board_name) in
+		night,viomi)
+			{
+			for dev in /dev/ttyUSB*; do
+				if [ -e "$dev" ]; then
+					echo "at+cfun=1,1" > "$dev"
+				fi
+			done
+			} &
+		;;
+	esac
+}

@@ -26,7 +26,7 @@ EOF
 sed -i '/\/bin\/login -f root/!s|/bin/login|/bin/login -f root|' /etc/config/ttyd && /etc/init.d/ttyd reload
 
 sed -i '/OPENWRT_RELEASE/d' /usr/lib/os-release
-echo "OPENWRT_RELEASE='ImmortalWrt-IPQ (with QSDK) / R25.8.29'" >> /usr/lib/os-release
+echo "OPENWRT_RELEASE='ImmortalWrt-IPQ (with QSDK) / R25.10.04'" >> /usr/lib/os-release
 
 rm -rf /tmp/luci-modulecache/
 rm -f /tmp/luci-indexcache

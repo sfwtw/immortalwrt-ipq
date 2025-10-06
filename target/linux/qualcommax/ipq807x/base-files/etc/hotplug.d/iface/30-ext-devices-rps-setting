@@ -6,9 +6,9 @@ for IFACE in /sys/class/net/*; do
     INTERFACE=$(basename "$IFACE")
     IFNAME_PREFIX="${INTERFACE%%[0-9]*}"
     # logger -t ext-devices-rps "Setting RPS for ${INTERFACE} with prefix ${IFNAME_PREFIX}"
-    if { [ "$IFNAME_PREFIX" = "usb" ] || [ "$IFNAME_PREFIX" = "eth" ] || [ "$IFNAME_PREFIX" = "phy" ]; }; then
+    if { [ "$IFNAME_PREFIX" = "usb" ] || [ "$IFNAME_PREFIX" = "eth" ] || [ "$IFNAME_PREFIX" = "rmnet" ] || [ "$IFNAME_PREFIX" = "phy" ]; }; then
         echo 7 > "/sys/class/net/${INTERFACE}/queues/rx-0/rps_cpus"
-    elif [ "$IFNAME_PREFIX" = "rmnet" ]; then
+    elif [ "$IFNAME_PREFIX" = "rmnet_mhi" ]; then
         echo 7 > "/sys/class/net/${INTERFACE}/queues/rx-0/rps_cpus"
         setaffinity  'mhi'         3 1
         setaffinity  'mhi'         3 2
